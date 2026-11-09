@@ -9,7 +9,7 @@
 - 🎨 Interface bonita com **figlet** (ASCII art colorido)
 - 📂 **Separa por gêneros** - Sertanejo, Hip Hop, Pop, Rock, Funk, Pagode, **Dance**, Jazz, Clássico, MPB, Eletrônica
 - 🎤 **Pesquisar por artista** ou DJ
-- 📆 **Buscar por ano** - encontre músicas de um ano específico
+- 📆 **Buscar por ano** - encontre músicas de um ano específico (ex: 2023, 2024)
 - 📀 **Baixar álbuns completos**
 - 🎵 **MP3 com capa integrada** (artwork)
 - ⚙️ **Configuração de bitrate** (128k, 192k, 256k, 320k)
@@ -27,8 +27,8 @@ pkg update && pkg upgrade -y
 # 2. Configure o armazenamento do Android
 termux-setup-storage
 
-# 3. Clone ou baixe o projeto
-git clone https://github.com/seu-usuario/baixador-cd.git
+# 3. Clone o projeto
+git clone https://github.com/alexdias9421/baixador-cd.git
 cd baixador-cd
 ```
 
@@ -79,7 +79,7 @@ Menu:
 
 ---
 
-## 🎵 Gêneros Disponíveis
+## 🎵 Gêneros Disponíveis (12 total)
 
 | Número | Gênero |
 |--------|--------|
@@ -89,7 +89,7 @@ Menu:
 | 4 | Rock |
 | 5 | Funk |
 | 6 | Pagode |
-| 7 | **Dance** |
+| 7 | **Dance** ✨ |
 | 8 | Jazz |
 | 9 | Clássico |
 | 10 | MPB |
@@ -100,17 +100,19 @@ Menu:
 
 ## 📆 Buscar por Ano (NOVO!)
 
+Encontre as músicas mais populares de um ano específico:
+
 ```
 Escolha> 4
 
-Digite o ano (ex: 2023 ou 2024): 2023
-Digite artista (ou Enter para 'Top hits'): 
-Genero (1-11): 2
+Digite o ano (ex: 2023 ou 2024): 2024
+Digite artista (ou Enter para 'Top hits'): [ENTER]
+Genero (1-12): 7
 
 Preparando download...
-  Query:   Top hits 2023
-  Genero:  Hip Hop
-  Pasta:   /sdcard/Download/CDs_BAIXADOS/Hip Hop
+  Query:   Top hits 2024
+  Genero:  Dance
+  Pasta:   /sdcard/Download/CDs_BAIXADOS/Dance
 ```
 
 ---
@@ -126,13 +128,15 @@ Preparando download...
 | 3 | 256k |
 | 4 | 320k (máximo) |
 
+> O bitrate é salvo automaticamente e usado nas próximas sessões.
+
 ---
 
-## 📁 Onde os Arquivos São Salvos
+## 📁 Estrutura de Downloads
 
 **Pasta padrão:** `/sdcard/Download/CDs_BAIXADOS`
 
-### Estrutura:
+### Pastas criadas automaticamente:
 ```
 CDs_BAIXADOS/
 ├── Sertanejo/
@@ -141,22 +145,44 @@ CDs_BAIXADOS/
 ├── Rock/
 ├── Funk/
 ├── Pagode/
-├── Dance/
+├── Dance/      ← NOVO!
 ├── Jazz/
 ├── Classico/
 ├── MPB/
-└── Eletronica/
+├── Eletronica/
+└── Outros/
+```
+
+---
+
+## 📝 Comandos Úteis
+
+```bash
+# Verificar instalação
+baixador-cd --help
+
+# Mostrar status
+baixador-cd → Opção 5
+
+# Ver caminho
+baixador-cd → Opção 6
+
+# Limpar preferencias
+rm -rf ~/.config/baixador_cd/
+
+# Atualizar script
+git pull origin main
 ```
 
 ---
 
 ## 🚪 Como Sair
 
-Pressione **`0`** no menu principal.
+Pressione **`0`** no menu principal ou use **`Ctrl + C`**.
 
 ---
 
-## 📝 Exemplo de Uso Completo
+## 📋 Exemplos de Uso
 
 ### Opção 1 - Pesquisar por artista:
 ```
@@ -171,17 +197,19 @@ Preparando download...
   Pasta:   /sdcard/Download/CDs_BAIXADOS/Hip Hop
 ```
 
-### Opção 4 - Buscar por ano:
+### Opção 3 - Baixar por gênero:
 ```
-Escolha> 4
+Escolha> 3
 
-Digite o ano (ex: 2023 ou 2024): 2024
-Digite artista (ou Enter para 'Top hits'): 
-Genero (1-11): 3
+1) Sertanejo  | 2) Hip Hop  | 3) Pop  | 4) Rock
+5) Funk       | 6) Pagode   | 7) Dance| 8) Jazz
+9) Classico   | 10) MPB    | 11) Eletronica | 12) Outro
+
+Escolha o genero (1-12): 7
 
 Preparando download...
-  Query:   Top hits 2024
-  Genero:  Pop
+  Query:   Top Dance Hits
+  Genero:  Dance
 ```
 
 ### Opção 5 - Mostrar status:
@@ -192,7 +220,8 @@ Status dos Downloads:
   Pasta principal: /sdcard/Download/CDs_BAIXADOS
   Pop: 25 musicas
   Hip Hop: 18 musicas
-  Total: 43 arquivos MP3
+  Dance: 12 musicas
+  Total: 55 arquivos MP3
 ```
 
 ---
@@ -208,21 +237,30 @@ Status dos Downloads:
 
 ---
 
-## 🗂️ Arquivos do Projeto
-
-```
-baixador-cd/
-├── instalar.sh           # Instalador completo
-├── baixador_cd.sh        # Script completo
-├── baixador_cd_simple.sh # Versão simplificada
-└── README_BAIXADOR_CD.md # Este arquivo
-```
-
----
-
 ## 📜 Licença
 
 MIT License - Livre para uso e modificação.
+
+**Copyright (c) 2026 Claude Code**
+
+---
+
+## 🤝 Contribuições
+
+Aberto para issues e pull requests!  
+
+---
+
+## 📸 Banner ASCII
+
+```
+    ____  ___    _____  __ ___    ____  ____  ____    
+   / __ )/   |  /  _/ |/ //   |  / __ \/ __ \/ __ \   
+  / __  / /| |  / / |   // /| | / / / / / / / /_/ /   
+ / /_/ / ___ |_/ / /   |/ ___ |/ /_/ / /_/ / _, _/    
+/_____/_/  |_/___//_/|_/_/  |_/_____/\____/_/ |_|   
+                                                     
+```
 
 ---
 
@@ -230,13 +268,23 @@ MIT License - Livre para uso e modificação.
 
 Para buscar as músicas mais populares de um determinado ano:
 
-```
+```bash
 baixador-cd
 → Opção 4 (Buscar por ano)
 → Digite o ano desejado (ex: 2024)
 → Pressione Enter para artista
-→ Escolha o gênero
+→ Escolha o gênero (ou 7 para Dance!)
 ```
+
+---
+
+## 📊 Estatísticas do Projeto
+
+- **Gêneros suportados:** 12
+- **Dependências:** 5 (ffmpeg, figlet, python, yt-dlp, mutagen)
+- **Formato de saída:** MP3 com capa integrada
+- **Código:** ~350 linhas
+- **Licença:** MIT
 
 ---
 
