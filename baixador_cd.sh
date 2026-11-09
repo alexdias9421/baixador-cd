@@ -79,6 +79,7 @@ carregar_prefs() {
     fi
     BITRATE_MUSICA="${BITRATE_MUSICA:-320k}"
     USE_CAPA="${USE_CAPA:-true}"
+    MAX_MUSICAS="${MAX_MUSICAS:-20}"
 }
 
 # ============================================================================
@@ -88,6 +89,7 @@ salvar_prefs() {
     cat > "$PREFS_FILE" << EOF
 BITRATE_MUSICA="$BITRATE_MUSICA"
 USE_CAPA="$USE_CAPA"
+MAX_MUSICAS="$MAX_MUSICAS"
 EOF
 }
 
@@ -132,6 +134,37 @@ escolher_bitrate() {
 }
 
 # ============================================================================
+# FUNÇÃO: Escolher número máximo de músicas
+# ============================================================================
+escolher_max_musicas() {
+    echo -e "${CYAN}Quantas músicas deseja baixar no máximo?${RESET}"
+    echo -e "  ${AMARELO}1)${RESET} 10 músicas"
+    echo -e "  ${AMARELO}2)${RESET} 20 músicas (padrão)"
+    echo -e "  ${AMARELO}3)${RESET} 30 músicas"
+    echo -e "  ${AMARELO}4)${RESET} 50 músicas"
+    echo -e "  ${AMARELO}5)${RESET} Personalizado"
+    read -p "Escolha [1-5]: " max_choice
+
+    case $max_choice in
+        1) MAX_MUSICAS=10 ;;
+        2) MAX_MUSICAS=20 ;;
+        3) MAX_MUSICAS=30 ;;
+        4) MAX_MUSICAS=50 ;;
+        5)
+            read -p "Digite o número máximo de músicas: " MAX_MUSICAS
+            if ! [[ "$MAX_MUSICAS" =~ ^[0-9]+$ ]] || [ "$MAX_MUSICAS" -lt 1 ]; then
+                echo -e "${VERMELHO}Número inválido. Usando padrão (20).${RESET}"
+                MAX_MUSICAS=20
+            fi
+            ;;
+        *) MAX_MUSICAS=20 ;;
+    esac
+
+    salvar_prefs
+    echo -e "${VERDE}✓ Máximo de músicas definido para: $MAX_MUSICAS${RESET}"
+}
+
+# ============================================================================
 # FUNÇÃO: Baixar músicas de um artista por gênero
 # ============================================================================
 baixar_por_genero() {
@@ -164,6 +197,7 @@ search_query = "${search_query}"
 output_dir = "${output_dir}"
 bitrate = "${BITRATE_MUSICA}"
 genre = "${genero}"
+max_musicas = ${MAX_MUSICAS}
 
 ydl_opts = {
     'format': 'bestaudio/best',
@@ -184,7 +218,7 @@ ydl_opts = {
     'writethumbnail': True,
     'addmetadata': True,
     'noplaylist': False,
-    'playlistend': 50,  # Máximo de músicas por download
+    'playlistend': max_musicas,  # Máximo de músicas por download
 }
 
 try:
@@ -224,6 +258,7 @@ import os
 search_query = "ytsearch1:${artista} ${album} official album"
 output_dir = "${output_dir}"
 bitrate = "${BITRATE_MUSICA}"
+max_musicas = ${MAX_MUSICAS}
 
 ydl_opts = {
     'format': 'bestaudio/best',
@@ -244,6 +279,7 @@ ydl_opts = {
     'addmetadata': True,
     'noplaylist': False,
     'extract_flat': False,
+    'playlistend': max_musicas,
 }
 
 try:
@@ -341,6 +377,7 @@ import os
 url = "${url_ou_busca}"
 output_dir = "${output_dir}"
 bitrate = "${BITRATE_MUSICA}"
+max_musicas = ${MAX_MUSICAS}
 
 ydl_opts = {
     'format': 'bestaudio/best',
@@ -359,6 +396,7 @@ ydl_opts = {
     'embedthumbnail': True,
     'writethumbnail': True,
     'addmetadata': True,
+    'playlistend': max_musicas,
 }
 
 try:
@@ -433,6 +471,31 @@ mostrar_caminho() {
 }
 
 # ============================================================================
+# FUNÇÃO: Menu de configurações
+# ============================================================================
+menu_configuracoes() {
+    while true; do
+        echo ""
+        echo -e "${CYAN}============================================${RESET}"
+        echo -e "${CYAN}           CONFIGURAÇÕES                    ${RESET}"
+        echo -e "${CYAN}============================================${RESET}"
+        echo ""
+        echo -e "  ${AMARELO}1)${RESET} Escolher bitrate do MP3 (atual: ${BITRATE_MUSICA})"
+        echo -e "  ${AMARELO}2)${RESET} Escolher máximo de músicas (atual: ${MAX_MUSICAS})"
+        echo -e "  ${AMARELO}0)${RESET} Voltar"
+        echo ""
+        read -p "Escolha uma opção: " cfg_opcao
+
+        case $cfg_opcao in
+            1) escolher_bitrate ;;
+            2) escolher_max_musicas ;;
+            0) break ;;
+            *) echo -e "${VERMELHO}Opção inválida!${RESET}" ;;
+        esac
+    done
+}
+
+# ============================================================================
 # MENU PRINCIPAL
 # ============================================================================
 menu_principal() {
@@ -477,7 +540,7 @@ menu_principal() {
                 ;;
             4) mostrar_status ;;
             5) mostrar_caminho ;;
-            6) escolher_bitrate ;;
+            6) menu_configuracoes ;;
             7) limpar_downloads ;;
             0)
                 echo ""
