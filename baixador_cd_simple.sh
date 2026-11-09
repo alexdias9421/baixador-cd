@@ -11,7 +11,7 @@ MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
 # Pastas
-DOWNLOAD_BASE="/sdcard/Download/CDs_BAIXADOS"
+DOWNLOAD_BASE="$HOME/storage/downloads/CDs_BAIXADOS"
 PREFS_FILE="$HOME/.config/baixador_cd/prefs.conf"
 mkdir -p "$HOME/.config/baixador_cd"
 mkdir -p "$DOWNLOAD_BASE"

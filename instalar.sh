@@ -1,5 +1,5 @@
 #!/data/data/com.termux/files/usr/bin/bash
-# Instalador Do Baixador De CD - Projeto Termux (ATUALIZADO - com busca por ano)
+# Instalador Do Baixador De CD - Projeto Termux (ATUALIZADO - com busca por ano e desinstalação)
 
 # Cores
 VERDE='\033[1;32m'
@@ -9,6 +9,77 @@ AZUL='\033[1;34m'
 CYAN='\033[1;36m'
 MAGENTA='\033[1;35m'
 RESET='\033[0m'
+
+# Verificar se é pedido de desinstalação
+if [[ "$1" == "--desinstalar" ]] || [[ "$1" == "-u" ]] || [[ "$1" == "desinstalar" ]]; then
+    echo -e "${VERMELHO}============================================${RESET}"
+    echo -e "${VERMELHO}    DESINSTALADOR DO BAIXADOR DE CD         ${RESET}"
+    echo -e "${VERMELHO}============================================${RESET}"
+    echo ""
+    echo -e "${AMARELO}ATENÇÃO: Isso vai remover o Baixador de CD e suas configurações.${RESET}"
+    echo ""
+    read -p "Tem certeza que deseja desinstalar? (s/n): " confirm
+    if [[ ! "$confirm" =~ ^[sS]$ ]]; then
+        echo -e "${CYAN}Desinstalação cancelada.${RESET}"
+        exit 0
+    fi
+
+    echo ""
+    echo -e "${AMARELO}[1/4] Removendo comando 'baixador-cd'...${RESET}"
+    if [ -f "$HOME/.local/bin/baixador-cd" ]; then
+        rm -f "$HOME/.local/bin/baixador-cd"
+        echo -e "${VERDE}[✓] Comando removido${RESET}"
+    else
+        echo -e "${AMARELO}[!] Comando não encontrado${RESET}"
+    fi
+
+    echo ""
+    echo -e "${AMARELO}[2/4] Removendo configurações e preferências...${RESET}"
+    if [ -d "$HOME/.config/baixador_cd" ]; then
+        rm -rf "$HOME/.config/baixador_cd"
+        echo -e "${VERDE}[✓] Configurações removidas${RESET}"
+    else
+        echo -e "${AMARELO}[!] Pasta de configurações não encontrada${RESET}"
+    fi
+
+    echo ""
+    echo -e "${AMARELO}[3/4] Removendo PATH do .bashrc...${RESET}"
+    if grep -q ".local/bin" "$HOME/.bashrc" 2>/dev/null; then
+        sed -i '/\.local\/bin/d' "$HOME/.bashrc"
+        echo -e "${VERDE}[✓] PATH removido do .bashrc${RESET}"
+    else
+        echo -e "${AMARELO}[!] PATH não encontrado no .bashrc${RESET}"
+    fi
+
+    echo ""
+    echo -e "${AMARELO}[4/4] Remover arquivos baixados?${RESET}"
+    DOWNLOAD_BASE="/sdcard/Download/CDs_BAIXADOS"
+    [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="$HOME/storage/downloads/CDs_BAIXADOS"
+    [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="$HOME/Download/CDs_BAIXADOS"
+
+    if [ -d "$DOWNLOAD_BASE" ]; then
+        echo -e "  Pasta encontrada: ${CYAN}$DOWNLOAD_BASE${RESET}"
+        read -p "Deseja remover também os arquivos de música baixados? (s/n): " remover_downloads
+        if [[ "$remover_downloads" =~ ^[sS]$ ]]; then
+            rm -rf "$DOWNLOAD_BASE"
+            echo -e "${VERDE}[✓] Arquivos baixados removidos${RESET}"
+        else
+            echo -e "${CYAN}[i] Arquivos baixados mantidos em: $DOWNLOAD_BASE${RESET}"
+        fi
+    else
+        echo -e "${AMARELO}[!] Pasta de downloads não encontrada${RESET}"
+    fi
+
+    echo ""
+    echo -e "${VERDE}============================================${RESET}"
+    echo -e "${VERDE}    DESINSTALAÇÃO CONCLUÍDA COM SUCESSO!    ${RESET}"
+    echo -e "${VERDE}============================================${RESET}"
+    echo ""
+    echo -e "${CYAN}O Baixador de CD foi removido do seu sistema.${RESET}"
+    echo -e "${CYAN}Feche e abra o Termux novamente para atualizar o PATH.${RESET}"
+    echo ""
+    exit 0
+fi
 
 echo -e "${AZUL}============================================${RESET}"
 echo -e "${AZUL}    INSTALADOR DO BAIXADOR DE CD            ${RESET}"
@@ -110,14 +181,19 @@ baixar_musicas() {
     mkdir -p "$output"
 
     echo ""
+    read -p "Quantas músicas deseja baixar? (ex: 10): " limit
+    if [ -z "$limit" ]; then limit=20; fi
+
     echo -e "${AZUL}Preparando download...${RESET}"
     echo -e "  Query:   $query"
     echo -e "  Genero:  $genero"
+    echo -e "  Limite:  $limit músicas"
     echo -e "  Pasta:   $output"
     echo ""
 
     # Adiciona "music" ou "song" dependendo do query
-    yt-dlp -f "bestaudio" --extract-audio --audio-format mp3 --audio-quality "$BITRATE" --embed-thumbnail --add-metadata --progress -o "$output/%(title)s.%(ext)s" "ytsearch50:$query music" 2>&1 | grep -E "(Downloading|Destination|aria2|Analyzing)" || true
+    # Limite de 50MB (52428800 bytes)
+    yt-dlp -f "bestaudio" --extract-audio --audio-format mp3 --audio-quality "$BITRATE" --embed-thumbnail --add-metadata --playlist-end "$limit" --max-filesize 52428800 --progress -o "$output/%(title)s.%(ext)s" "ytsearch50:$query music" 2>&1 | grep -E "(Downloading|Destination|aria2|Analyzing)" || true
 
     echo ""
     echo -e "${VERDE}Download concluido!${RESET}"
@@ -309,4 +385,9 @@ echo ""
 echo -e "${CYAN}Caminho dos downloads:${RESET}"
 echo -e "  ${AMARELO}/sdcard/Download/CDs_BAIXADOS${RESET}"
 echo -e "  Ou: ${AMARELO}$HOME/storage/downloads/CDs_BAIXADOS${RESET}"
+echo ""
+echo -e "${CYAN}Para desinstalar:${RESET}"
+echo -e "  Execute: ${AMARELO}bash instalar.sh --desinstalar${RESET}"
+echo -e "  Ou: ${AMARELO}bash instalar.sh -u${RESET}"
+echo -e "  Ou: ${AMARELO}bash instalar.sh desinstalar${RESET}"
 echo ""

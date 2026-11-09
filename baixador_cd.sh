@@ -17,7 +17,7 @@ BRANCO='\033[1;37m'
 RESET='\033[0m'
 
 # Pastas
-DOWNLOAD_BASE="$HOME/Download/CDs_BAIXADOS"
+DOWNLOAD_BASE="$HOME/storage/downloads/CDs_BAIXADOS"
 GENRE_CACHE="$HOME/.config/baixador_cd/genres.json"
 PREFS_FILE="$HOME/.config/baixador_cd/prefs.conf"
 
