@@ -1,0 +1,17 @@
+# Personal files
+*.sh~
+*.bak
+.DS_Store
+Thumbs.db
+
+# Config files
+.config/
+*.pyc
+__pycache__/
+
+# Download folders (excluded from repo)
+**/CDs_BAIXADOS/
+**/.local/bin/baixador-cd
+
+# Temp files
+temp_*
