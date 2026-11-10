@@ -11,7 +11,7 @@ MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
 # Configuracoes de versao e GitHub
-VERSAO_ATUAL="V1.0.0"
+VERSAO_ATUAL="V1.0.1"
 GITHUB_REPO="https://github.com/alexdias9421/baixador-cd.git"
 GITHUB_RAW="https://raw.githubusercontent.com/alexdias9421/baixador-cd/main"
 
