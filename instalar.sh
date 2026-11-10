@@ -10,6 +10,12 @@ CYAN='\033[1;36m'
 MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
+# Configurações de versão e GitHub
+VERSAO_ATUAL="V1.0.0"
+GITHUB_REPO="https://github.com/alexdias9421/baixador-cd.git"
+GITHUB_RAW="https://raw.githubusercontent.com/alexdias9421/baixador-cd/main"
+VERSION_FILE="$HOME/.config/baixador_cd/version.txt"
+
 # Verificar se é pedido de desinstalação
 if [[ "$1" == "--desinstalar" ]] || [[ "$1" == "-u" ]] || [[ "$1" == "desinstalar" ]]; then
     echo -e "${VERMELHO}============================================${RESET}"
@@ -128,6 +134,11 @@ CYAN='\033[1;36m'
 MAGENTA='\033[1;35m'
 RESET='\033[0m'
 
+# Configuracoes de versao e GitHub
+VERSAO_ATUAL="V1.0.0"
+GITHUB_REPO="https://github.com/alexdias9421/baixador-cd.git"
+GITHUB_RAW="https://raw.githubusercontent.com/alexdias9421/baixador-cd/main"
+
 # Pasta de downloads - detecta automaticamente
 DOWNLOAD_BASE="/sdcard/Download/CDs_BAIXADOS"
 [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="$HOME/storage/downloads/CDs_BAIXADOS"
@@ -147,8 +158,28 @@ echo ""
 figlet -f slant "BAIXADOR CD" 2>/dev/null || echo "   _____ _____   ____  _   _ ______ _____   _____ _   _ ______ _____ "
 echo -e "${MAGENTA}============================================${RESET}"
 echo -e "${MAGENTA}    Download de CDs por Genero Musical      ${RESET}"
+echo -e "${MAGENTA}            Versao: $VERSAO_ATUAL             ${RESET}"
 echo -e "${MAGENTA}============================================${RESET}"
 echo ""
+
+# Funcao: Verificar atualizacao no GitHub
+verificar_atualizacao() {
+    # Baixar versao remota
+    remote_version=$(curl -fsSL "$GITHUB_RAW/VERSION" 2>/dev/null | head -1 | tr -d '\r\n')
+
+    if [ -n "$remote_version" ] && [ "$remote_version" != "$VERSAO_ATUAL" ]; then
+        echo -e "${AMARELO}============================================${RESET}"
+        echo -e "${AMARELO}  ATUALIZACAO DISPONIVEL: $remote_version${RESET}"
+        echo -e "${AMARELO}  Versao atual: $VERSAO_ATUAL${RESET}"
+        echo -e "${AMARELO}============================================${RESET}"
+        echo ""
+        return 0
+    fi
+    return 1
+}
+
+# Verificar atualizacoes na inicializacao (em background)
+verificar_atualizacao &
 
 # Funcao: Listar generos
 listar_generos() {
@@ -259,6 +290,82 @@ buscar_por_ano() {
     baixar_musicas "$query" "$genero"
 }
 
+# Funcao: Verificar atualizacao no GitHub
+verificar_atualizacao() {
+    echo -e "${CYAN}Verificando atualizacoes...${RESET}"
+
+    # Baixar versao remota
+    remote_version=$(curl -fsSL "$GITHUB_RAW/VERSION" 2>/dev/null | head -1 | tr -d '\r\n')
+
+    if [ -n "$remote_version" ] && [ "$remote_version" != "$VERSAO_ATUAL" ]; then
+        echo -e "${AMARELO}============================================${RESET}"
+        echo -e "${AMARELO}  ATUALIZACAO DISPONIVEL: $remote_version${RESET}"
+        echo -e "${AMARELO}  Versao atual: $VERSAO_ATUAL${RESET}"
+        echo -e "${AMARELO}============================================${RESET}"
+        echo ""
+        return 0
+    elif [ -n "$remote_version" ]; then
+        echo -e "${VERDE}Voce esta na versao mais recente ($VERSAO_ATUAL)${RESET}"
+        return 1
+    else
+        echo -e "${AMARELO}Nao foi possivel verificar atualizacoes${RESET}"
+        return 2
+    fi
+}
+
+# Funcao: Atualizar via GitHub
+atualizar_github() {
+    echo ""
+    echo -e "${CYAN}Atualizar via GitHub${RESET}"
+    echo -e "  Repositorio: ${GITHUB_REPO}${RESET}"
+    echo ""
+
+    # Verificar se tem atualizacao primeiro
+    remote_version=$(curl -fsSL "$GITHUB_RAW/VERSION" 2>/dev/null | head -1 | tr -d '\r\n')
+
+    if [ -n "$remote_version" ] && [ "$remote_version" != "$VERSAO_ATUAL" ]; then
+        echo -e "${AMARELO}Nova versao encontrada: $remote_version (atual: $VERSAO_ATUAL)${RESET}"
+        read -p "Deseja atualizar agora? (s/n): " confirm
+        if [[ ! "$confirm" =~ ^[sS]$ ]]; then
+            echo -e "${CYAN}Atualizacao cancelada.${RESET}"
+            return
+        fi
+    elif [ -n "$remote_version" ]; then
+        echo -e "${VERDE}Ja esta na versao mais recente ($VERSAO_ATUAL)${RESET}"
+        read -p "Forcar re-instalacao? (s/n): " confirm
+        if [[ ! "$confirm" =~ ^[sS]$ ]]; then
+            return
+        fi
+    else
+        echo -e "${AMARELO}Nao foi possivel verificar versao remota. Continuar mesmo assim? (s/n): ${RESET}"
+        read -p "" confirm
+        if [[ ! "$confirm" =~ ^[sS]$ ]]; then
+            return
+        fi
+    fi
+
+    echo ""
+    echo -e "${AZUL}Baixando atualizacao...${RESET}"
+
+    # Baixar o script de instalacao do GitHub
+    temp_script="/tmp/instalar_github.sh"
+    if curl -fsSL "$GITHUB_RAW/instalar.sh" -o "$temp_script" 2>/dev/null; then
+        chmod +x "$temp_script"
+        echo -e "${VERDE}Script baixado com sucesso!${RESET}"
+        echo -e "${AMARELO}Executando atualizacao...${RESET}"
+        echo ""
+        bash "$temp_script"
+        echo ""
+        echo -e "${VERDE}Atualizacao concluida! Reinicie o Termux.${RESET}"
+        rm -f "$temp_script"
+        exit 0
+    else
+        echo -e "${VERMELHO}Erro ao baixar do GitHub.${RESET}"
+        echo -e "${CYAN}Verifique sua conexao ou tente novamente mais tarde.${RESET}"
+        rm -f "$temp_script"
+    fi
+}
+
 # Loop principal do menu
 while true; do
     echo ""
@@ -270,6 +377,7 @@ while true; do
     echo -e "  ${AMARELO}5)${RESET} Mostrar status"
     echo -e "  ${AMARELO}6)${RESET} Mostrar caminho"
     echo -e "  ${AMARELO}7)${RESET} Configurar opcoes"
+    echo -e "  ${AMARELO}8)${RESET} Atualizar via GitHub"
     echo -e "  ${AMARELO}0)${RESET} Sair"
     echo ""
 
@@ -347,6 +455,7 @@ while true; do
         5) mostrar_status ;;
         6) mostrar_caminho ;;
         7) configurar_bitrate ;;
+        8) atualizar_github ;;
 
         0)
             echo ""
