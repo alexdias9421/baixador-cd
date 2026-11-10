@@ -59,8 +59,10 @@ if [[ "$1" == "--desinstalar" ]] || [[ "$1" == "-u" ]] || [[ "$1" == "desinstala
 
     echo ""
     echo -e "${AMARELO}[4/4] Remover arquivos baixados?${RESET}"
-    DOWNLOAD_BASE="/sdcard/Download/CDs_BAIXADOS"
+    DOWNLOAD_BASE="$HOME/storage/music/CDs_BAIXADOS"
+    [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="/sdcard/Music/CDs_BAIXADOS"
     [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="$HOME/storage/downloads/CDs_BAIXADOS"
+    [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="/sdcard/Download/CDs_BAIXADOS"
     [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="$HOME/Download/CDs_BAIXADOS"
 
     if [ -d "$DOWNLOAD_BASE" ]; then
@@ -139,9 +141,11 @@ VERSAO_ATUAL="V1.0.0"
 GITHUB_REPO="https://github.com/alexdias9421/baixador-cd.git"
 GITHUB_RAW="https://raw.githubusercontent.com/alexdias9421/baixador-cd/main"
 
-# Pasta de downloads - detecta automaticamente
-DOWNLOAD_BASE="/sdcard/Download/CDs_BAIXADOS"
+# Pasta de downloads - detecta automaticamente (prioridade: Music > Downloads)
+DOWNLOAD_BASE="$HOME/storage/music/CDs_BAIXADOS"
+[ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="/sdcard/Music/CDs_BAIXADOS"
 [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="$HOME/storage/downloads/CDs_BAIXADOS"
+[ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="/sdcard/Download/CDs_BAIXADOS"
 [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="$HOME/Download/CDs_BAIXADOS"
 mkdir -p "$DOWNLOAD_BASE"
 
@@ -492,8 +496,8 @@ echo -e "  2. Abra o Termux novamente"
 echo -e "  3. Digite: ${AMARELO}baixador-cd${RESET}"
 echo ""
 echo -e "${CYAN}Caminho dos downloads:${RESET}"
-echo -e "  ${AMARELO}/sdcard/Download/CDs_BAIXADOS${RESET}"
-echo -e "  Ou: ${AMARELO}$HOME/storage/downloads/CDs_BAIXADOS${RESET}"
+echo -e "  ${AMARELO}$HOME/storage/music/CDs_BAIXADOS${RESET}  (pasta Music)"
+echo -e "  Ou: ${AMARELO}/sdcard/Music/CDs_BAIXADOS${RESET}"
 echo ""
 echo -e "${CYAN}Para desinstalar:${RESET}"
 echo -e "  Execute: ${AMARELO}bash instalar.sh --desinstalar${RESET}"

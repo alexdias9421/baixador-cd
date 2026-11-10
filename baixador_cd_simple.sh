@@ -15,9 +15,11 @@ VERSAO_ATUAL="V1.0.0"
 GITHUB_REPO="https://github.com/alexdias9421/baixador-cd.git"
 GITHUB_RAW="https://raw.githubusercontent.com/alexdias9421/baixador-cd/main"
 
-# Pasta de downloads - detecta automaticamente
-DOWNLOAD_BASE="/sdcard/Download/CDs_BAIXADOS"
+# Pasta de downloads - detecta automaticamente (prioridade: Music > Downloads)
+DOWNLOAD_BASE="$HOME/storage/music/CDs_BAIXADOS"
+[ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="/sdcard/Music/CDs_BAIXADOS"
 [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="$HOME/storage/downloads/CDs_BAIXADOS"
+[ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="/sdcard/Download/CDs_BAIXADOS"
 [ ! -d "$DOWNLOAD_BASE" ] && DOWNLOAD_BASE="$HOME/Download/CDs_BAIXADOS"
 mkdir -p "$DOWNLOAD_BASE"
 
