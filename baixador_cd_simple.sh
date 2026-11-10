@@ -74,7 +74,7 @@ baixar_musicas() {
     echo ""
 
     yt-dlp -f "bestaudio/best" --extract-audio --audio-format mp3 \
-        --audio-quality "$BITRATE_MUSICA" --embed-thumbnail --add-metadata \
+        --audio-quality "$BITRATE_MUSICA" --add-metadata \
         -o "$output_dir/%(title)s.%(ext)s" "ytsearch50:${artista} ${genero} music"
 
     echo ""
