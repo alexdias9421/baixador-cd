@@ -430,6 +430,87 @@ mostrar_status() {
 }
 
 # ============================================================================
+# FUNÇÃO: Atualizar script do GitHub
+# ============================================================================
+atualizar_script() {
+    echo -e "${CYAN}Verificando atualizações no GitHub...${RESET}"
+    echo ""
+
+    local repo_dir="/data/data/com.termux/files/home/baixador-cd"
+    local repo_url="https://github.com/alexdias9421/baixador-cd.git"
+
+    # Verificar se o diretório existe
+    if [ ! -d "$repo_dir/.git" ]; then
+        echo -e "${VERMELHO}Erro: Repositório Git não encontrado em $repo_dir${RESET}"
+        echo -e "${AMARELO}Tentando clonar do GitHub...${RESET}"
+        git clone "$repo_url" "$repo_dir" 2>/dev/null
+        if [ $? -ne 0 ]; then
+            echo -e "${VERMELHO}Falha ao clonar repositório${RESET}"
+            return
+        fi
+    fi
+
+    cd "$repo_dir"
+
+    # Verificar se há conexão com GitHub
+    if ! git ls-remote "$repo_url" &>/dev/null; then
+        echo -e "${VERMELHO}Sem conexão com o GitHub${RESET}"
+        return
+    fi
+
+    # Buscar últimas alterações
+    git fetch origin 2>/dev/null
+
+    # Verificar se há atualizações
+    local local_commit=$(git rev-parse HEAD)
+    local remote_commit=$(git rev-parse origin/main)
+
+    if [ "$local_commit" = "$remote_commit" ]; then
+        echo -e "${VERDE}✓ Script já está na versão mais recente${RESET}"
+        echo -e "${CYAN}Versão atual: ${local_commit:0:7}${RESET}"
+        return
+    fi
+
+    echo -e "${AMARELO}Nova versão disponível!${RESET}"
+    echo -e "${CYAN}Local:  ${local_commit:0:7}${RESET}"
+    echo -e "${CYAN}Remoto: ${remote_commit:0:7}${RESET}"
+    echo ""
+
+    # Mostrar log das mudanças
+    echo -e "${CYAN}Alterações:${RESET}"
+    git log --oneline --no-merges HEAD..origin/main | head -10
+    echo ""
+
+    read -p "Deseja atualizar agora? (s/n): " confirm
+
+    if [[ "$confirm" =~ ^[sS]$ ]]; then
+        echo -e "${AMARELO}Atualizando...${RESET}"
+
+        # Backup das configurações
+        local prefs_backup="/tmp/baixador_prefs_$(date +%s).conf"
+        if [ -f "$HOME/.config/baixador_cd/prefs.conf" ]; then
+            cp "$HOME/.config/baixador_cd/prefs.conf" "$prefs_backup"
+        fi
+
+        # Fazer pull
+        git pull origin main
+
+        if [ $? -eq 0 ]; then
+            # Restaurar preferências
+            if [ -f "$prefs_backup" ]; then
+                mkdir -p "$HOME/.config/baixador_cd"
+                cp "$prefs_backup" "$HOME/.config/baixador_cd/prefs.conf"
+            fi
+
+            echo -e "${VERDE}✓ Script atualizado com sucesso!${RESET}"
+            echo -e "${CYAN}Reinicie o script para aplicar as mudanças${RESET}"
+        else
+            echo -e "${VERMELHO}Erro ao atualizar${RESET}"
+        fi
+    fi
+}
+
+# ============================================================================
 # FUNÇÃO: Desinstalar o script
 # ============================================================================
 desinstalar_script() {
@@ -513,7 +594,8 @@ menu_principal() {
         echo -e "  ${AMARELO}5)${RESET} Mostrar caminho dos arquivos"
         echo -e "  ${AMARELO}6)${RESET} Configurar opções"
         echo -e "  ${AMARELO}7)${RESET} Limpar downloads"
-        echo -e "  ${AMARELO}8)${RESET} Desinstalar script"
+        echo -e "  ${AMARELO}8)${RESET} Atualizar script (GitHub)"
+        echo -e "  ${AMARELO}9)${RESET} Desinstalar script"
         echo -e "  ${AMARELO}0)${RESET} Sair"
         echo ""
 
@@ -547,7 +629,8 @@ menu_principal() {
             5) mostrar_caminho ;;
             6) menu_configuracoes ;;
             7) limpar_downloads ;;
-            8) desinstalar_script ;;
+            8) atualizar_script ;;
+            9) desinstalar_script ;;
             0)
                 echo ""
                 echo -e "${VERDE}Obrigado por usar o BAIXADOR DE CD!${RESET}"
