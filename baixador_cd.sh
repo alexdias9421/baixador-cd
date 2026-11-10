@@ -207,15 +207,11 @@ ydl_opts = {
         'preferredquality': bitrate.replace('k', ''),
     }, {
         'key': 'FFmpegMetadata',
-    }, {
-        'key': 'EmbedThumbnail',
     }],
     'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
     'progress_hooks': [],
     'quiet': False,
     'no_warnings': False,
-    'embedthumbnail': True,
-    'writethumbnail': True,
     'addmetadata': True,
     'noplaylist': False,
     'playlistend': max_musicas,  # Máximo de músicas por download
@@ -268,14 +264,10 @@ ydl_opts = {
         'preferredquality': bitrate.replace('k', ''),
     }, {
         'key': 'FFmpegMetadata',
-    }, {
-        'key': 'EmbedThumbnail',
     }],
     'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
     'quiet': False,
     'no_warnings': False,
-    'embedthumbnail': True,
-    'writethumbnail': True,
     'addmetadata': True,
     'noplaylist': False,
     'extract_flat': False,
@@ -387,14 +379,10 @@ ydl_opts = {
         'preferredquality': bitrate.replace('k', ''),
     }, {
         'key': 'FFmpegMetadata',
-    }, {
-        'key': 'EmbedThumbnail',
     }],
     'outtmpl': os.path.join(output_dir, '%(title)s.%(ext)s'),
     'quiet': False,
     'no_warnings': False,
-    'embedthumbnail': True,
-    'writethumbnail': True,
     'addmetadata': True,
     'playlistend': max_musicas,
 }
@@ -439,6 +427,22 @@ mostrar_status() {
     done
 
     echo ""
+}
+
+# ============================================================================
+# FUNÇÃO: Desinstalar o script
+# ============================================================================
+desinstalar_script() {
+    echo -e "${VERMELHO}ATENÇÃO: Isso removerá permanentemente o script e suas configurações!${RESET}"
+    read -p "Tem certeza que deseja prosseguir com a remoção? (s/n): " confirm
+
+    if [[ "$confirm" =~ ^[sS]$ ]]; then
+        echo -e "${AMARELO}Removendo arquivos...${RESET}"
+        rm -rf "$HOME/.config/baixador_cd"
+        rm -f "$0"
+        echo -e "${VERDE}Script desinstalado com sucesso!${RESET}"
+        exit 0
+    fi
 }
 
 # ============================================================================
@@ -509,6 +513,7 @@ menu_principal() {
         echo -e "  ${AMARELO}5)${RESET} Mostrar caminho dos arquivos"
         echo -e "  ${AMARELO}6)${RESET} Configurar opções"
         echo -e "  ${AMARELO}7)${RESET} Limpar downloads"
+        echo -e "  ${AMARELO}8)${RESET} Desinstalar script"
         echo -e "  ${AMARELO}0)${RESET} Sair"
         echo ""
 
@@ -542,6 +547,7 @@ menu_principal() {
             5) mostrar_caminho ;;
             6) menu_configuracoes ;;
             7) limpar_downloads ;;
+            8) desinstalar_script ;;
             0)
                 echo ""
                 echo -e "${VERDE}Obrigado por usar o BAIXADOR DE CD!${RESET}"
